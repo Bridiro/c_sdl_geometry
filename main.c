@@ -5,8 +5,8 @@
 
 typedef struct {
     int id;
-    int x;
-    int y;
+    float x;
+    float y;
 } Point;
 
 Point bezier(Point P0, Point P1, Point P2, float t) {
@@ -19,7 +19,7 @@ Point bezier(Point P0, Point P1, Point P2, float t) {
 
 int is_near(Point p, int mouse_x, int mouse_y) {
     int threshold = 10;
-    return (abs(p.x - mouse_x) < threshold && abs(p.y - mouse_y) < threshold);
+    return (fabs(p.x - mouse_x) < threshold && fabs(p.y - mouse_y) < threshold);
 }
 
 void draw_circle_bresenham(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_t radius) {
@@ -28,14 +28,57 @@ void draw_circle_bresenham(SDL_Renderer* renderer, int32_t centreX, int32_t cent
     int32_t p = 1 - radius;
 
     while (x >= y) {
-        SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
-        SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
-        SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
-        SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
-        SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
-        SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
-        SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
-        SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                float dist_x = (centreX + x + i) - trunc(centreX + x + i);
+                float dist_y = (centreY + y + j) - trunc(centreY + y + j);
+                int alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX + x + i, centreY + y + j);
+
+                dist_x = (centreX - x + i) - trunc(centreX - x + i);
+                dist_y = (centreY + y + j) - trunc(centreY + y + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX - x + i, centreY + y + j);
+
+                dist_x = (centreX + x + i) - trunc(centreX + x + i);
+                dist_y = (centreY - y + j) - trunc(centreY - y + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX + x + i, centreY - y + j);
+
+                dist_x = (centreX - x + i) - trunc(centreX - x + i);
+                dist_y = (centreY - y + j) - trunc(centreY - y + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX - x + i, centreY - y + j);
+
+                dist_x = (centreX + y + i) - trunc(centreX + y + i);
+                dist_y = (centreY + x + j) - trunc(centreY + x + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX + y + i, centreY + x + j);
+
+                dist_x = (centreX - y + i) - trunc(centreX - y + i);
+                dist_y = (centreY + x + j) - trunc(centreY + x + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX - y + i, centreY + x + j);
+
+                dist_x = (centreX + y + i) - trunc(centreX + y + i);
+                dist_y = (centreY - x + j) - trunc(centreY - x + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX + y + i, centreY - x + j);
+
+                dist_x = (centreX - y + i) - trunc(centreX - y + i);
+                dist_y = (centreY - x + j) - trunc(centreY - x + j);
+                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+                SDL_RenderDrawPoint(renderer, centreX - y + i, centreY - x + j);
+            }
+        }
 
         y++;
 
@@ -61,6 +104,10 @@ void draw_dotted_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2) {
 
     for (int i = 0; i < steps; i++) {
         if (i % 10 < 5) {
+            float dist_x = x - trunc(x);
+            float dist_y = y - trunc(y);
+            int alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
             SDL_RenderDrawPoint(renderer, (int)x, (int)y);
         }
         x += x_inc;
@@ -79,6 +126,7 @@ int main() {
     TTF_SizeText(Poppins, "p -> toggle points | l -> toggle lines | + -> add 2 points | - -> remove 2 points", &text_width, &text_height);
     SDL_Window* window = SDL_CreateWindow("Bezier Curve", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     Point P0 = {0, 100, 400};
     Point P1 = {1, 320, 50};
@@ -183,14 +231,18 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         for (float t = 0; t <= 1; t += 0.0001) {
             for (int i = 0; i < len - 2; i += 2) {
                 Point p = bezier(points[i], points[i + 1], points[i + 2], t);
+                float dist_x = p.x - trunc(p.x);
+                float dist_y = p.y - trunc(p.y);
+                int alpha = (int)(255 * (1 - 2 * sqrt(dist_x * dist_x + dist_y * dist_y)));
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
                 SDL_RenderDrawPoint(renderer, (int)p.x, (int)p.y);
             }
         }
 
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         if (lines_on) {
             for (int i = 0; i < len - 1; i++) {
                 draw_dotted_line(renderer, points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
