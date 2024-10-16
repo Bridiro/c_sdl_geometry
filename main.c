@@ -98,66 +98,85 @@ int main() {
     int quit = 0;
     while (!quit) {
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
-                quit = 1;
-            } else if (e.type == SDL_MOUSEBUTTONDOWN) {
-                int mouse_x = e.button.x;
-                int mouse_y = e.button.y;
+            switch (e.type) {
+                case SDL_QUIT: {
+                    quit = 1;
+                    break;
+                }
+                case SDL_MOUSEBUTTONDOWN: {
+                    int mouse_x = e.button.x;
+                    int mouse_y = e.button.y;
 
-                for (int i = 0; i < len; i++) {
-                    if (is_near(points[i], mouse_x, mouse_y)) {
-                        selected_point = i;
-                        break;
+                    for (int i = 0; i < len; i++) {
+                        if (is_near(points[i], mouse_x, mouse_y)) {
+                            selected_point = i;
+                            break;
+                        }
                     }
+                    break;
                 }
-            } else if (e.type == SDL_MOUSEBUTTONUP) {
-                selected_point = -1;
-            } else if (e.type == SDL_MOUSEMOTION && selected_point != -1) {
-                points[selected_point].x = e.motion.x;
-                points[selected_point].y = e.motion.y;
-                int w, h;
-                SDL_GetRendererOutputSize(renderer, &w, &h);
-                if (points[selected_point].x > w - 5) {
-                    points[selected_point].x = w - 5;
-                } else if (points[selected_point].x < 5) {
-                    points[selected_point].x = 5;
+                case SDL_MOUSEBUTTONUP: {
+                    selected_point = -1;
+                    break;
                 }
-                if (points[selected_point].y > h - 5) {
-                    points[selected_point].y = h - 5;
-                } else if (points[selected_point].y < 5) {
-                    points[selected_point].y = 5;
-                }
-            } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_PLUS) {
-                    int w, h;
-                    SDL_GetRendererOutputSize(renderer, &w, &h);
-                    len += 2;
-                    points = realloc(points, len * sizeof(Point));
-                    int diff_x = points[len - 3].x - points[len - 4].x;
-                    int diff_y = points[len - 3].y - points[len - 4].y;
-                    int pos_control_x = points[len - 3].x + diff_x;
-                    int pos_control_y = points[len - 3].y + diff_y;
-                    while (pos_control_x < 5 || pos_control_x > w - 5 || pos_control_y < 5 || pos_control_y > h - 5) {
-                        diff_x /= 2;
-                        diff_y /= 2;
-                        pos_control_x = points[len - 3].x + diff_x;
-                        pos_control_y = points[len - 3].y + diff_y;
+                case SDL_MOUSEMOTION: {
+                    if (selected_point != -1) {
+                        points[selected_point].x = e.motion.x;
+                        points[selected_point].y = e.motion.y;
+                        int w, h;
+                        SDL_GetRendererOutputSize(renderer, &w, &h);
+                        if (points[selected_point].x > w - 5) {
+                            points[selected_point].x = w - 5;
+                        } else if (points[selected_point].x < 5) {
+                            points[selected_point].x = 5;
+                        }
+                        if (points[selected_point].y > h - 5) {
+                            points[selected_point].y = h - 5;
+                        } else if (points[selected_point].y < 5) {
+                            points[selected_point].y = 5;
+                        }
                     }
-                    points[len - 2] = (Point){len - 1, pos_control_x, pos_control_y};
-                    points[len - 1] = (Point){len - 2, 370, 240};
-                }
-                if (e.key.keysym.sym == SDLK_MINUS) {
-                    if (len > 4) {
-                        len -= 2;
-                        points = realloc(points, len * sizeof(Point));
+                    break;
+                } 
+                case SDL_KEYDOWN: {
+                    switch (e.key.keysym.sym) {
+                        case SDLK_PLUS: {
+                            int w, h;
+                            SDL_GetRendererOutputSize(renderer, &w, &h);
+                            len += 2;
+                            points = realloc(points, len * sizeof(Point));
+                            int diff_x = points[len - 3].x - points[len - 4].x;
+                            int diff_y = points[len - 3].y - points[len - 4].y;
+                            int pos_control_x = points[len - 3].x + diff_x;
+                            int pos_control_y = points[len - 3].y + diff_y;
+                            while (pos_control_x < 5 || pos_control_x > w - 5 || pos_control_y < 5 || pos_control_y > h - 5) {
+                                diff_x /= 2;
+                                diff_y /= 2;
+                                pos_control_x = points[len - 3].x + diff_x;
+                                pos_control_y = points[len - 3].y + diff_y;
+                            }
+                            points[len - 2] = (Point){len - 1, pos_control_x, pos_control_y};
+                            points[len - 1] = (Point){len - 2, 370, 240};
+                            break;
+                        }
+                        case SDLK_MINUS: {
+                            if (len > 4) {
+                                len -= 2;
+                                points = realloc(points, len * sizeof(Point));
+                            }
+                            break;
+                        }
+                        case SDLK_l: {
+                            lines_on = !lines_on;
+                            break;
+                        }
+                        case SDLK_p: {
+                            points_on = !points_on;
+                            break;
+                        }
                     }
-                }
-                if (e.key.keysym.sym == SDLK_l) {
-                    lines_on = !lines_on;
-                }
-                if (e.key.keysym.sym == SDLK_p) {
-                    points_on = !points_on;
-                }
+                break;
+            }
             }
         }
 
