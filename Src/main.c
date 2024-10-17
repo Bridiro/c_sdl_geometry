@@ -2,12 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <math.h>
-
-typedef struct {
-    int id;
-    float x;
-    float y;
-} Point;
+#include "utilities.h"
 
 Point bezier(Point P0, Point P1, Point P2, float t) {
     Point result;
@@ -17,108 +12,10 @@ Point bezier(Point P0, Point P1, Point P2, float t) {
     return result;
 }
 
-int is_near(Point p, int mouse_x, int mouse_y) {
-    int threshold = 10;
-    return (fabs(p.x - mouse_x) < threshold && fabs(p.y - mouse_y) < threshold);
-}
-
-void draw_circle_bresenham(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_t radius) {
-    int32_t x = radius;
-    int32_t y = 0;
-    int32_t p = 1 - radius;
-
-    while (x >= y) {
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                float dist_x = (centreX + x + i) - trunc(centreX + x + i);
-                float dist_y = (centreY + y + j) - trunc(centreY + y + j);
-                int alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX + x + i, centreY + y + j);
-
-                dist_x = (centreX - x + i) - trunc(centreX - x + i);
-                dist_y = (centreY + y + j) - trunc(centreY + y + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX - x + i, centreY + y + j);
-
-                dist_x = (centreX + x + i) - trunc(centreX + x + i);
-                dist_y = (centreY - y + j) - trunc(centreY - y + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX + x + i, centreY - y + j);
-
-                dist_x = (centreX - x + i) - trunc(centreX - x + i);
-                dist_y = (centreY - y + j) - trunc(centreY - y + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX - x + i, centreY - y + j);
-
-                dist_x = (centreX + y + i) - trunc(centreX + y + i);
-                dist_y = (centreY + x + j) - trunc(centreY + x + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX + y + i, centreY + x + j);
-
-                dist_x = (centreX - y + i) - trunc(centreX - y + i);
-                dist_y = (centreY + x + j) - trunc(centreY + x + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX - y + i, centreY + x + j);
-
-                dist_x = (centreX + y + i) - trunc(centreX + y + i);
-                dist_y = (centreY - x + j) - trunc(centreY - x + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX + y + i, centreY - x + j);
-
-                dist_x = (centreX - y + i) - trunc(centreX - y + i);
-                dist_y = (centreY - x + j) - trunc(centreY - x + j);
-                alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-                SDL_RenderDrawPoint(renderer, centreX - y + i, centreY - x + j);
-            }
-        }
-
-        y++;
-
-        if (p <= 0) {
-            p = p + 2 * y + 1;
-        } else {
-            x--;
-            p = p + 2 * y - 2 * x + 1;
-        }
-    }
-}
-
-void draw_dotted_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2) {
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-    int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
-
-    float x_inc = (float)dx / steps;
-    float y_inc = (float)dy / steps;
-
-    float x = x1;
-    float y = y1;
-
-    for (int i = 0; i < steps; i++) {
-        if (i % 10 < 5) {
-            float dist_x = x - trunc(x);
-            float dist_y = y - trunc(y);
-            int alpha = (int)(255 * (1 - sqrt(dist_x * dist_x + dist_y * dist_y)));
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
-            SDL_RenderDrawPoint(renderer, (int)x, (int)y);
-        }
-        x += x_inc;
-        y += y_inc;
-    }
-}
-
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
-    TTF_Font* Poppins = TTF_OpenFont("Poppins-Regular.ttf", 15);
+    TTF_Font* Poppins = TTF_OpenFont("Misc/Poppins-Regular.ttf", 15);
     SDL_Color White = {255, 255, 255};
     SDL_Surface* surfaceMessage =
         TTF_RenderText_Solid(Poppins, "p -> toggle points | l -> toggle lines | + -> add 2 points | - -> remove 2 points", White);
