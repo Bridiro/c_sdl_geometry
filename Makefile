@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g -lSDL2 -lSDL2_ttf -lm
 BUILD_DIR = build
-TARGET = sdl_bezier_curve
+TARGET = sdl_bezier_curve.out
 SRCS = $(wildcard */*.c)
 OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SRCS)))
 INC=Inc/
