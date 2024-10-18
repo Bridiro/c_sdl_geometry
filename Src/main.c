@@ -12,10 +12,14 @@ int main()
     SDL_Window *window = SDL_CreateWindow("Bezier Curve", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 640, 480);
 
     float zoom = 1;
     int pan_x = 0;
     int pan_y = 0;
+
+    int width = 640;
+    int height = 480;
 
     bezier_s bez = new_bezier();
 
@@ -27,10 +31,14 @@ int main()
     int quit = 0;
     while (!quit)
     {
-
         int w, h;
         SDL_GetRendererOutputSize(renderer, &w, &h);
-        SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+        if (w != width || h != height)
+        {
+            width = w;
+            height = h;
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+        }
         SDL_SetRenderTarget(renderer, texture);
         while (SDL_PollEvent(&e))
         {
@@ -67,8 +75,6 @@ int main()
                 {
                     bez.points[selected_point].x = e.motion.x;
                     bez.points[selected_point].y = e.motion.y;
-                    int w, h;
-                    SDL_GetRendererOutputSize(renderer, &w, &h);
                     if (bez.points[selected_point].x > w - 5)
                     {
                         bez.points[selected_point].x = w - 5;
@@ -152,15 +158,12 @@ int main()
             {
                 bezier_draw_points(&bez, renderer, White, 5, 2);
             }
-            int w, h;
-            SDL_GetRendererOutputSize(renderer, &w, &h);
             SDL_SetRenderTarget(renderer, NULL);
-            SDL_Rect dest_rect;
-            dest_rect.w = (int)(w * zoom);
-            dest_rect.h = (int)(h * zoom);
-            dest_rect.x = (w - dest_rect.w) / 2 + pan_x;
-            dest_rect.y = (h - dest_rect.h) / 2 + pan_y;
-
+            SDL_Rect dest_rect = {
+                .w = (int)(w * zoom),
+                .h = (int)(h * zoom),
+                .x = (w - dest_rect.w) / 2 + pan_x,
+                .y = (h - dest_rect.h) / 2 + pan_y};
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
