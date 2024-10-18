@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -g -lSDL2 -lSDL2_ttf -lm
+CFLAGS = -Wall -g
+LINKER_FLAGS = -lSDL2 -lSDL2_ttf -lm
 BUILD_DIR = build
 TARGET = sdl_bezier_curve.out
 SRCS = $(wildcard */*.c)
@@ -13,7 +14,7 @@ all: $(TARGET)
 	@echo "Target up to date"
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(INCLUDES) -o $(TARGET)
+	$(CC) $(CFLAGS) $(OBJS) $(INCLUDES) -o $(TARGET) $(LINKER_FLAGS)
 
 $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR) 
 	$(CC) -c $< -o $@ $(INCLUDES)

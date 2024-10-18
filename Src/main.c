@@ -1,10 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
-#include <math.h>
-#include "utilities.h"
 #include "bezier.h"
-#include "text.h"
 
 int main()
 {
