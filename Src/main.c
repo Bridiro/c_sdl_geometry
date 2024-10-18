@@ -16,6 +16,10 @@ int main()
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+    float zoom = 1;
+    int pan_x = 0;
+    int pan_y = 0;
+
     bezier_s bez = new_bezier();
 
     int lines_on = 1;
@@ -26,6 +30,11 @@ int main()
     int quit = 0;
     while (!quit)
     {
+
+        int w, h;
+        SDL_GetRendererOutputSize(renderer, &w, &h);
+        SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+        SDL_SetRenderTarget(renderer, texture);
         while (SDL_PollEvent(&e))
         {
             switch (e.type)
@@ -80,18 +89,23 @@ int main()
                         bez.points[selected_point].y = 5;
                     }
                 }
+                else if (e.motion.state & SDL_BUTTON_LMASK)
+                {
+                    pan_x += e.motion.xrel;
+                    pan_y += e.motion.yrel;
+                }
                 break;
             }
             case SDL_KEYDOWN:
             {
                 switch (e.key.keysym.sym)
                 {
-                case SDLK_PLUS:
+                case SDLK_a:
                 {
                     bezier_add(&bez, renderer);
                     break;
                 }
-                case SDLK_MINUS:
+                case SDLK_r:
                 {
                     bezier_remove(&bez);
                     break;
@@ -106,30 +120,58 @@ int main()
                     points_on = !points_on;
                     break;
                 }
+                case SDLK_PLUS:
+                {
+                    zoom += 0.1;
+                    break;
+                }
+                case SDLK_MINUS:
+                {
+                    zoom -= 0.1;
+                    break;
+                }
+                case SDLK_ESCAPE:
+                {
+                    zoom = 1;
+                    pan_x = 0;
+                    pan_y = 0;
+                    bez = new_bezier();
+                    break;
                 }
                 break;
+                }
             }
             }
-        }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
 
-        bezier_draw_curve(&bez, renderer, White, 1);
-        if (lines_on)
-        {
-            bezier_draw_lines(&bez, renderer, White, 1);
+            bezier_draw_curve(&bez, renderer, White, 1);
+            if (lines_on)
+            {
+                bezier_draw_lines(&bez, renderer, White, 1);
+            }
+            if (points_on)
+            {
+                bezier_draw_points(&bez, renderer, White, 5, 2);
+            }
+            int w, h;
+            SDL_GetRendererOutputSize(renderer, &w, &h);
+            SDL_SetRenderTarget(renderer, NULL);
+            SDL_Rect dest_rect;
+            dest_rect.w = (int)(w * zoom);
+            dest_rect.h = (int)(h * zoom);
+            dest_rect.x = (w - dest_rect.w) / 2 + pan_x;
+            dest_rect.y = (h - dest_rect.h) / 2 + pan_y;
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
+            draw_text(renderer, Poppins, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 45);
+            draw_text(renderer, Poppins, White, "esc -> reset | +/- -> zoom", 10, h - 30);
+            SDL_RenderPresent(renderer);
         }
-        if (points_on)
-        {
-            bezier_draw_points(&bez, renderer, White, 5, 2);
-        }
-        int w, h;
-        SDL_GetRendererOutputSize(renderer, &w, &h);
-        draw_text(renderer, Poppins, White, "p -> toggle points | l -> toggle lines | + -> add 2 points | - -> remove 2 points", 10, h - 30);
-        SDL_RenderPresent(renderer);
     }
-
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

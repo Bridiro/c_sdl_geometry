@@ -32,17 +32,25 @@ void bezier_add(bezier_s *self, SDL_Renderer *renderer)
     self->points = realloc(self->points, self->num * sizeof(BezierPoint));
     int diff_x = self->points[self->num - 3].x - self->points[self->num - 4].x;
     int diff_y = self->points[self->num - 3].y - self->points[self->num - 4].y;
+    int diff_x_half = diff_x / 2;
+    int diff_y_half = diff_y / 2;
     int pos_control_x = self->points[self->num - 3].x + diff_x;
     int pos_control_y = self->points[self->num - 3].y + diff_y;
+    int pos_control_x_half = self->points[self->num - 3].x + diff_x_half;
+    int pos_control_y_half = self->points[self->num - 3].y + diff_y_half;
     while (pos_control_x < 5 || pos_control_x > w - 5 || pos_control_y < 5 || pos_control_y > h - 5)
     {
         diff_x /= 2;
         diff_y /= 2;
+        diff_x_half /= 2;
+        diff_y_half /= 2;
         pos_control_x = self->points[self->num - 3].x + diff_x;
         pos_control_y = self->points[self->num - 3].y + diff_y;
+        pos_control_x_half = self->points[self->num - 3].x + diff_x_half;
+        pos_control_y_half = self->points[self->num - 3].y + diff_y_half;
     }
-    self->points[self->num - 2] = (BezierPoint){self->num - 1, pos_control_x, pos_control_y};
-    self->points[self->num - 1] = (BezierPoint){self->num - 2, 370, 240};
+    self->points[self->num - 2] = (BezierPoint){self->num - 1, pos_control_x_half, pos_control_y_half};
+    self->points[self->num - 1] = (BezierPoint){self->num - 2, pos_control_x, pos_control_y};
 }
 
 /**
