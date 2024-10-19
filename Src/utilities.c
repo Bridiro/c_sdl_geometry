@@ -9,7 +9,7 @@
  */
 int is_near(int32_t p_x, int32_t p_y, int32_t mouse_x, int32_t mouse_y)
 {
-    int8_t threshold = 10;
+    int8_t threshold = 20;
     return (abs(p_x - mouse_x) < threshold && abs(p_y - mouse_y) < threshold);
 }
 

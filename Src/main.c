@@ -7,9 +7,10 @@ int main()
 {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
-    TTF_Font *Poppins = TTF_OpenFont("Misc/Poppins-Regular.ttf", 15);
+    TTF_Font *Poppins20 = TTF_OpenFont("Misc/Poppins-Regular.ttf", 20);
+    TTF_Font *Poppins15 = TTF_OpenFont("Misc/Poppins-Regular.ttf", 15);
     SDL_Color White = {255, 255, 255};
-    SDL_Window *window = SDL_CreateWindow("Bezier Curve", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("SDL Geometry", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 640, 480);
@@ -53,15 +54,7 @@ int main()
             {
                 int mouse_x = e.button.x;
                 int mouse_y = e.button.y;
-
-                for (int i = 0; i < bez.num; i++)
-                {
-                    if (is_near(bez.points[i].x, bez.points[i].y, mouse_x, mouse_y))
-                    {
-                        selected_point = i;
-                        break;
-                    }
-                }
+                selected_point = select_point(&bez, mouse_x, mouse_y);
                 break;
             }
             case SDL_MOUSEBUTTONUP:
@@ -73,24 +66,7 @@ int main()
             {
                 if (selected_point != -1)
                 {
-                    bez.points[selected_point].x = e.motion.x;
-                    bez.points[selected_point].y = e.motion.y;
-                    if (bez.points[selected_point].x > w - 5)
-                    {
-                        bez.points[selected_point].x = w - 5;
-                    }
-                    else if (bez.points[selected_point].x < 5)
-                    {
-                        bez.points[selected_point].x = 5;
-                    }
-                    if (bez.points[selected_point].y > h - 5)
-                    {
-                        bez.points[selected_point].y = h - 5;
-                    }
-                    else if (bez.points[selected_point].y < 5)
-                    {
-                        bez.points[selected_point].y = 5;
-                    }
+                    move_point(&bez, selected_point, e.motion.x, e.motion.y, w, h);
                 }
                 else if (e.motion.state & SDL_BUTTON_LMASK)
                 {
@@ -167,8 +143,9 @@ int main()
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
-            draw_text(renderer, Poppins, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 45);
-            draw_text(renderer, Poppins, White, "esc -> reset | +/- -> zoom", 10, h - 30);
+            draw_text(renderer, Poppins20, White, "Bezier Curves", 10, 10);
+            draw_text(renderer, Poppins15, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 45);
+            draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom", 10, h - 30);
             SDL_RenderPresent(renderer);
         }
     }

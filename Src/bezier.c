@@ -142,3 +142,53 @@ BezierPoint calculate_bezier(BezierPoint P0, BezierPoint P1, BezierPoint P2, flo
     result.y = u * u * P0.y + 2 * u * t * P1.y + t * t * P2.y;
     return result;
 }
+
+/**
+ * @brief Select a control point
+ * @param bez Bezier curve
+ * @param mouse_x Mouse x position
+ * @param mouse_y Mouse y position
+ * @return int Index of the selected point
+ */
+int select_point(bezier_s *bez, int mouse_x, int mouse_y)
+{
+    for (int i = 0; i < bez->num; i++)
+    {
+        if (is_near(bez->points[i].x, bez->points[i].y, mouse_x, mouse_y))
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * @brief Move a control point
+ * @param bez Bezier curve
+ * @param selected_point Index of the selected point
+ * @param mouse_x Mouse x position
+ * @param mouse_y Mouse y position
+ * @param w Window width
+ * @param h Window height
+ */
+void move_point(bezier_s *bez, int selected_point, int mouse_x, int mouse_y, int w, int h)
+{
+    bez->points[selected_point].x = mouse_x;
+    bez->points[selected_point].y = mouse_y;
+    if (bez->points[selected_point].x > w - 5)
+    {
+        bez->points[selected_point].x = w - 5;
+    }
+    else if (bez->points[selected_point].x < 5)
+    {
+        bez->points[selected_point].x = 5;
+    }
+    if (bez->points[selected_point].y > h - 5)
+    {
+        bez->points[selected_point].y = h - 5;
+    }
+    else if (bez->points[selected_point].y < 5)
+    {
+        bez->points[selected_point].y = 5;
+    }
+}
