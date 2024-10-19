@@ -13,7 +13,7 @@ int main()
     SDL_Window *window = SDL_CreateWindow("SDL Geometry", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 640, 480);
+    SDL_SetRenderTarget(renderer, NULL);
 
     float zoom = 1;
     int pan_x = 0;
@@ -37,13 +37,6 @@ int main()
     {
         int w, h;
         SDL_GetRendererOutputSize(renderer, &w, &h);
-        if (w != width || h != height)
-        {
-            width = w;
-            height = h;
-            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
-        }
-        SDL_SetRenderTarget(renderer, texture);
         while (SDL_PollEvent(&e))
         {
             switch (e.type)
@@ -55,10 +48,7 @@ int main()
             }
             case SDL_MOUSEBUTTONDOWN:
             {
-                int mouse_x = e.button.x;
-                int mouse_y = e.button.y;
-                mouse_world_coordinates(mouse_x, mouse_y, &mouse_x, &mouse_y, pan_x, pan_y, zoom, w, h);
-                bezier_select_point(&bez, mouse_x, mouse_y);
+                bezier_select_point(&bez, e.button.x, e.button.y, zoom, pan_x, pan_y);
                 break;
             }
             case SDL_MOUSEBUTTONUP:
@@ -70,10 +60,7 @@ int main()
             {
                 if (bez.selected_point != -1)
                 {
-                    int mouse_x = e.motion.x;
-                    int mouse_y = e.motion.y;
-                    mouse_world_coordinates(mouse_x, mouse_y, &mouse_x, &mouse_y, pan_x, pan_y, zoom, w, h);
-                    bezier_move_point(&bez, mouse_x, mouse_y, w, h);
+                    bezier_move_point(&bez, e.motion.x, e.motion.y, w, h, zoom, pan_x, pan_y);
                 }
                 else if (e.motion.state & SDL_BUTTON_LMASK)
                 {
@@ -152,18 +139,9 @@ int main()
 
             if (mode == BEZIER)
             {
-                bezier_draw(&bez, renderer, White, 1, 1, 5, 2);
+                bezier_draw(&bez, renderer, White, 1, 1, 5, 2, zoom, pan_x, pan_y);
             }
 
-            SDL_SetRenderTarget(renderer, NULL);
-            SDL_Rect dest_rect = {
-                .w = (int)(w * zoom),
-                .h = (int)(h * zoom),
-                .x = (w - dest_rect.w) / 2 + pan_x,
-                .y = (h - dest_rect.h) / 2 + pan_y};
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderClear(renderer);
-            SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
             draw_text(renderer, Poppins20, White, "Bezier Curves", 10, 10);
             draw_text(renderer, Poppins15, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 45);
             draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom", 10, h - 30);

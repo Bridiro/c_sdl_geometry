@@ -162,21 +162,3 @@ void draw_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, const ch
     SDL_FreeSurface(surfaceMessage);
     SDL_DestroyTexture(Message);
 }
-
-/**
- * @brief Convert screen coordinates to world coordinates
- * @param mouse_screen_x X coordinate of the mouse
- * @param mouse_screen_y Y coordinate of the mouse
- * @param mouse_world_x Pointer to store the X coordinate of the mouse pointer in world coordinates
- * @param mouse_world_y Pointer to store the Y coordinate of the mouse pointer in world coordinates
- * @param pan_x X coordinate of the pan
- * @param pan_y Y coordinate of the pan
- * @param zoom Zoom level
- * @param w Width of the screen
- * @param h Height of the screen
- */
-void mouse_world_coordinates(int mouse_screen_x, int mouse_screen_y, int *mouse_world_x, int *mouse_world_y, int pan_x, int pan_y, float zoom, int w, int h)
-{
-    *mouse_world_x = (mouse_screen_x - pan_x) / zoom + (w - w / zoom) / 2;
-    *mouse_world_y = (mouse_screen_y - pan_y) / zoom + (h - h / zoom) / 2;
-}

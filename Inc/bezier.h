@@ -23,12 +23,12 @@ typedef struct
 bezier_s bezier_new();
 void bezier_add(bezier_s *bez, SDL_Renderer *renderer);
 void bezier_remove(bezier_s *bez);
-void bezier_draw(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t c_thickness, int8_t l_thickness, int8_t p_radius, int8_t p_thickness);
-void bezier_draw_curve(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t thickness);
-void bezier_draw_lines(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t thickness);
-void bezier_draw_points(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t radius, int8_t thickness);
-BezierPoint bezier_calculate(BezierPoint P0, BezierPoint P1, BezierPoint P2, float t);
-void bezier_select_point(bezier_s *bez, int32_t mouse_x, int32_t mouse_y);
-void bezier_move_point(bezier_s *bez, int32_t mouse_x, int32_t mouse_y, int32_t w, int32_t h);
+void bezier_draw(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t c_thickness, int8_t l_thickness, int8_t p_radius, int8_t p_thickness, float zoom, int32_t pan_x, int32_t pan_y);
+void bezier_draw_curve(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t thickness, float zoom, int32_t pan_x, int32_t pan_y);
+void bezier_draw_lines(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t thickness, float zoom, int32_t pan_x, int32_t pan_y);
+void bezier_draw_points(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, int8_t radius, int8_t thickness, float zoom, int32_t pan_x, int32_t pan_y);
+BezierPoint bezier_calculate(BezierPoint P0, BezierPoint P1, BezierPoint P2, float t, float zoom, int32_t pan_x, int32_t pan_y);
+void bezier_select_point(bezier_s *bez, int32_t mouse_x, int32_t mouse_y, float zoom, int32_t pan_x, int32_t pan_y);
+void bezier_move_point(bezier_s *bez, int32_t mouse_x, int32_t mouse_y, int32_t w, int32_t h, float zoom, int32_t pan_x, int32_t pan_y);
 
 #endif // BEZIER_H
