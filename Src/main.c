@@ -22,11 +22,14 @@ int main()
     int width = 640;
     int height = 480;
 
-    bezier_s bez = new_bezier();
+    typedef enum
+    {
+        BEZIER,
+        STRAIGHT
+    } mode_e;
+    mode_e mode = BEZIER;
 
-    int lines_on = 1;
-    int points_on = 1;
-    int selected_point = -1;
+    bezier_s bez = bezier_new();
 
     SDL_Event e;
     int quit = 0;
@@ -54,19 +57,23 @@ int main()
             {
                 int mouse_x = e.button.x;
                 int mouse_y = e.button.y;
-                selected_point = select_point(&bez, mouse_x, mouse_y);
+                mouse_world_coordinates(mouse_x, mouse_y, &mouse_x, &mouse_y, pan_x, pan_y, zoom, w, h);
+                bezier_select_point(&bez, mouse_x, mouse_y);
                 break;
             }
             case SDL_MOUSEBUTTONUP:
             {
-                selected_point = -1;
+                bez.selected_point = -1;
                 break;
             }
             case SDL_MOUSEMOTION:
             {
-                if (selected_point != -1)
+                if (bez.selected_point != -1)
                 {
-                    move_point(&bez, selected_point, e.motion.x, e.motion.y, w, h);
+                    int mouse_x = e.motion.x;
+                    int mouse_y = e.motion.y;
+                    mouse_world_coordinates(mouse_x, mouse_y, &mouse_x, &mouse_y, pan_x, pan_y, zoom, w, h);
+                    bezier_move_point(&bez, mouse_x, mouse_y, w, h);
                 }
                 else if (e.motion.state & SDL_BUTTON_LMASK)
                 {
@@ -81,22 +88,34 @@ int main()
                 {
                 case SDLK_a:
                 {
-                    bezier_add(&bez, renderer);
+                    if (mode == BEZIER)
+                    {
+                        bezier_add(&bez, renderer);
+                    }
                     break;
                 }
                 case SDLK_r:
                 {
-                    bezier_remove(&bez);
+                    if (mode == BEZIER)
+                    {
+                        bezier_remove(&bez);
+                    }
                     break;
                 }
                 case SDLK_l:
                 {
-                    lines_on = !lines_on;
+                    if (mode == BEZIER)
+                    {
+                        bez.lines_on = !bez.lines_on;
+                    }
                     break;
                 }
                 case SDLK_p:
                 {
-                    points_on = !points_on;
+                    if (mode == BEZIER)
+                    {
+                        bez.points_on = !bez.points_on;
+                    }
                     break;
                 }
                 case SDLK_PLUS:
@@ -114,7 +133,13 @@ int main()
                     zoom = 1;
                     pan_x = 0;
                     pan_y = 0;
-                    bez = new_bezier();
+                    free(bez.points);
+                    bez = bezier_new();
+                    break;
+                }
+                case SDLK_RIGHT:
+                {
+                    pan_x += 10;
                     break;
                 }
                 break;
@@ -125,15 +150,11 @@ int main()
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
 
-            bezier_draw_curve(&bez, renderer, White, 1);
-            if (lines_on)
+            if (mode == BEZIER)
             {
-                bezier_draw_lines(&bez, renderer, White, 1);
+                bezier_draw(&bez, renderer, White, 1, 1, 5, 2);
             }
-            if (points_on)
-            {
-                bezier_draw_points(&bez, renderer, White, 5, 2);
-            }
+
             SDL_SetRenderTarget(renderer, NULL);
             SDL_Rect dest_rect = {
                 .w = (int)(w * zoom),
