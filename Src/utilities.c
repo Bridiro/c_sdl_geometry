@@ -2,7 +2,7 @@
 
 /**
  * @brief Check if a point is near the mouse pointer
- * @param p BezierPoint to check
+ * @param p bezier_point_s to check
  * @param mouse_x X coordinate of the mouse pointer
  * @param mouse_y Y coordinate of the mouse pointer
  * @return 1 if the point is near the mouse pointer, 0 otherwise

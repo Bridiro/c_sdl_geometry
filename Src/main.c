@@ -2,6 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include "bezier.h"
+#include "cartesian_graph.h"
 
 int main()
 {
@@ -30,6 +31,7 @@ int main()
     mode_e mode = BEZIER;
 
     bezier_s bez = bezier_new();
+    cartesian_graph_s cart = cartesian_graph_new(20, White, White);
 
     SDL_Event e;
     int quit = 0;
@@ -48,19 +50,28 @@ int main()
             }
             case SDL_MOUSEBUTTONDOWN:
             {
-                bezier_select_point(&bez, e.button.x, e.button.y, zoom, pan_x, pan_y);
+                if (mode == BEZIER)
+                {
+                    bezier_select_point(&bez, e.button.x, e.button.y, zoom, pan_x, pan_y);
+                }
                 break;
             }
             case SDL_MOUSEBUTTONUP:
             {
-                bez.selected_point = -1;
+                if (mode == BEZIER)
+                {
+                    bez.selected_point = -1;
+                }
                 break;
             }
             case SDL_MOUSEMOTION:
             {
                 if (bez.selected_point != -1)
                 {
-                    bezier_move_point(&bez, e.motion.x, e.motion.y, w, h, zoom, pan_x, pan_y);
+                    if (mode == BEZIER)
+                    {
+                        bezier_move_point(&bez, e.motion.x, e.motion.y, w, h, zoom, pan_x, pan_y);
+                    }
                 }
                 else if (e.motion.state & SDL_BUTTON_LMASK)
                 {
@@ -126,11 +137,17 @@ int main()
                     pan_y = 0;
                     free(bez.points);
                     bez = bezier_new();
+                    cart = cartesian_graph_new(20, White, White);
                     break;
                 }
                 case SDLK_RIGHT:
                 {
-                    pan_x += 10;
+                    mode = !mode;
+                    break;
+                }
+                case SDLK_LEFT:
+                {
+                    mode = !mode;
                     break;
                 }
                 break;
@@ -144,11 +161,15 @@ int main()
             if (mode == BEZIER)
             {
                 bezier_draw(&bez, renderer, White, 1, 1, 5, 2, zoom, pan_x, pan_y);
+                draw_text(renderer, Poppins20, White, "Bezier Curves", 10, 10);
+                draw_text(renderer, Poppins15, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 48);
             }
-
-            draw_text(renderer, Poppins20, White, "Bezier Curves", 10, 10);
-            draw_text(renderer, Poppins15, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 48);
-            draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom", 10, h - 30);
+            else
+            {
+                cartesian_graph_draw(&cart, renderer, w, h, zoom, pan_x, pan_y);
+                draw_text(renderer, Poppins20, White, "Cartesian Graph", 10, 10);
+            }
+            draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom | arrows -> change modes", 10, h - 30);
             SDL_RenderPresent(renderer);
         }
     }

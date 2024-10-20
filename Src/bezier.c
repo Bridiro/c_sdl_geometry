@@ -6,11 +6,11 @@
  */
 bezier_s bezier_new()
 {
-    BezierPoint P0 = {0, 100, 400};
-    BezierPoint P1 = {1, 320, 50};
-    BezierPoint P2 = {2, 540, 400};
+    bezier_point_s P0 = {0, 100, 400};
+    bezier_point_s P1 = {1, 320, 50};
+    bezier_point_s P2 = {2, 540, 400};
 
-    BezierPoint *points = malloc(3 * sizeof(BezierPoint));
+    bezier_point_s *points = malloc(3 * sizeof(bezier_point_s));
     points[0] = P0;
     points[1] = P1;
     points[2] = P2;
@@ -30,7 +30,7 @@ bezier_s bezier_new()
 void bezier_add(bezier_s *bez, SDL_Renderer *renderer)
 {
     bez->num += 2;
-    bez->points = realloc(bez->points, bez->num * sizeof(BezierPoint));
+    bez->points = realloc(bez->points, bez->num * sizeof(bezier_point_s));
     int diff_x = bez->points[bez->num - 3].x - bez->points[bez->num - 4].x;
     int diff_y = bez->points[bez->num - 3].y - bez->points[bez->num - 4].y;
     int diff_x_half = diff_x / 2;
@@ -39,8 +39,8 @@ void bezier_add(bezier_s *bez, SDL_Renderer *renderer)
     int pos_control_y = bez->points[bez->num - 3].y + diff_y;
     int pos_control_x_half = bez->points[bez->num - 3].x + diff_x_half;
     int pos_control_y_half = bez->points[bez->num - 3].y + diff_y_half;
-    bez->points[bez->num - 2] = (BezierPoint){bez->num - 1, pos_control_x_half, pos_control_y_half};
-    bez->points[bez->num - 1] = (BezierPoint){bez->num - 2, pos_control_x, pos_control_y};
+    bez->points[bez->num - 2] = (bezier_point_s){bez->num - 1, pos_control_x_half, pos_control_y_half};
+    bez->points[bez->num - 1] = (bezier_point_s){bez->num - 2, pos_control_x, pos_control_y};
 }
 
 /**
@@ -52,7 +52,7 @@ void bezier_remove(bezier_s *bez)
     if (bez->num > 4)
     {
         bez->num -= 2;
-        bez->points = realloc(bez->points, bez->num * sizeof(BezierPoint));
+        bez->points = realloc(bez->points, bez->num * sizeof(bezier_point_s));
     }
 }
 
@@ -95,7 +95,7 @@ void bezier_draw_curve(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, i
     {
         for (int i = 0; i < bez->num - 2; i += 2)
         {
-            BezierPoint p = bezier_calculate(bez->points[i], bez->points[i + 1], bez->points[i + 2], t, zoom, pan_x, pan_y);
+            bezier_point_s p = bezier_calculate(bez->points[i], bez->points[i + 1], bez->points[i + 2], t, zoom, pan_x, pan_y);
             float dist_x = p.x - trunc(p.x);
             float dist_y = p.y - trunc(p.y);
             int alpha = (int)(255 * (1 - 2 * sqrt(dist_x * dist_x + dist_y * dist_y)));
@@ -156,11 +156,11 @@ void bezier_draw_points(bezier_s *bez, SDL_Renderer *renderer, SDL_Color color, 
  * @param P1 Second control point
  * @param P2 Third control point
  * @param t Parameter
- * @return BezierPoint Point in the curve
+ * @return bezier_point_s Point in the curve
  */
-BezierPoint bezier_calculate(BezierPoint P0, BezierPoint P1, BezierPoint P2, float t, float zoom, int32_t pan_x, int32_t pan_y)
+bezier_point_s bezier_calculate(bezier_point_s P0, bezier_point_s P1, bezier_point_s P2, float t, float zoom, int32_t pan_x, int32_t pan_y)
 {
-    BezierPoint result;
+    bezier_point_s result;
     float u = 1 - t;
     result.x = (u * u * P0.x + 2 * u * t * P1.x + t * t * P2.x) * zoom + pan_x;
     result.y = (u * u * P0.y + 2 * u * t * P1.y + t * t * P2.y) * zoom + pan_y;
