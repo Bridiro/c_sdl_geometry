@@ -107,11 +107,15 @@ int main()
                 }
                 case SDLK_PLUS:
                 {
+                    pan_x -= 30;
+                    pan_y -= 30;
                     zoom += 0.1;
                     break;
                 }
                 case SDLK_MINUS:
                 {
+                    pan_x += 30;
+                    pan_y += 30;
                     zoom -= 0.1;
                     break;
                 }
@@ -143,7 +147,7 @@ int main()
             }
 
             draw_text(renderer, Poppins20, White, "Bezier Curves", 10, 10);
-            draw_text(renderer, Poppins15, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 45);
+            draw_text(renderer, Poppins15, White, "p -> toggle points | l -> toggle lines | a -> add 2 points | r -> remove 2 points", 10, h - 48);
             draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom", 10, h - 30);
             SDL_RenderPresent(renderer);
         }
