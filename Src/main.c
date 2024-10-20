@@ -26,13 +26,13 @@ int main()
     typedef enum
     {
         BEZIER,
-        STRAIGHT
+        CARTESIAN
     } mode_e;
     mode_e mode = BEZIER;
 
     bezier_s bez = bezier_new();
     cartesian_graph_s cart = cartesian_graph_new(20, White, White);
-    line_s line = line_new(1, 1);
+    cart.equation = "0.5x+2";
 
     SDL_Event e;
     int quit = 0;
@@ -117,14 +117,14 @@ int main()
                     }
                     break;
                 }
-                case SDLK_PLUS:
+                case SDLK_UP:
                 {
                     pan_x -= 30;
                     pan_y -= 30;
                     zoom += 0.1;
                     break;
                 }
-                case SDLK_MINUS:
+                case SDLK_DOWN:
                 {
                     pan_x += 30;
                     pan_y += 30;
@@ -168,7 +168,7 @@ int main()
             else
             {
                 cartesian_graph_draw(&cart, renderer, w, h, zoom, pan_x, pan_y);
-                line_draw(&line, renderer, White, w, h, zoom, pan_x, pan_y, cart.grid_distance);
+                cartesian_graph_draw_equation_result(&cart, renderer, White, w, h, zoom, pan_x, pan_y);
                 draw_text(renderer, Poppins20, White, "Cartesian Graph", 10, 10);
             }
             draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom | arrows -> change modes", 10, h - 30);

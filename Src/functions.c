@@ -1,10 +1,28 @@
 #include "functions.h"
 
+/**
+ * @brief Create a new line
+ * @param m The slope
+ * @param q The y-intercept
+ * @return line_s
+ */
 line_s line_new(float m, float q)
 {
     return (line_s){m, q};
 }
 
+/**
+ * @brief Draw a line
+ * @param line The line to draw
+ * @param renderer The renderer
+ * @param color The color of the line
+ * @param w The width of the window
+ * @param h The height of the window
+ * @param zoom The zoom level
+ * @param pan_x The x pan
+ * @param pan_y The y pan
+ * @param grid_step The distance between the grid lines
+ */
 void line_draw(line_s *line, SDL_Renderer *renderer, SDL_Color color, int32_t w, int32_t h, float zoom, int32_t pan_x, int32_t pan_y, int32_t grid_step)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
