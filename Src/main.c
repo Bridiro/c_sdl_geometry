@@ -32,6 +32,7 @@ int main()
 
     bezier_s bez = bezier_new();
     cartesian_graph_s cart = cartesian_graph_new(20, White, White);
+    line_s line = line_new(1, 1);
 
     SDL_Event e;
     int quit = 0;
@@ -167,6 +168,7 @@ int main()
             else
             {
                 cartesian_graph_draw(&cart, renderer, w, h, zoom, pan_x, pan_y);
+                line_draw(&line, renderer, White, w, h, zoom, pan_x, pan_y, cart.grid_distance);
                 draw_text(renderer, Poppins20, White, "Cartesian Graph", 10, 10);
             }
             draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom | arrows -> change modes", 10, h - 30);

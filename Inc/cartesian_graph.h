@@ -2,6 +2,7 @@
 #define CARTESIAN_GRAPH_H
 
 #include <SDL2/SDL.h>
+#include "functions.h"
 
 typedef struct
 {
