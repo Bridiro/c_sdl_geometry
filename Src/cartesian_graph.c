@@ -82,6 +82,10 @@ void cartesian_graph_draw_equation_result(cartesian_graph_s *cartesian_graph, SD
     }
     case PARABOLA:
     {
+        float a, b, c;
+        eq_parser_get_parabola_coefficients(cartesian_graph->equation, &a, &b, &c);
+        parabola_s parabola = parabola_new(a, b, c);
+        parabola_draw(&parabola, renderer, color, w, h, zoom, pan_x, pan_y, cartesian_graph->grid_distance);
         break;
     }
     default:
