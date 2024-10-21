@@ -74,67 +74,61 @@ void eq_parser_get_straight_coefficients(char *equation, float *m, float *q)
  */
 void eq_parser_get_parabola_coefficients(char *equation, float *a, float *b, float *c)
 {
-    // Inizializza i coefficienti
     *a = *b = *c = 0;
 
-    // Trova la posizione di "x^2"
     char *x2_pos = strstr(equation, "x^2");
     if (x2_pos != NULL)
     {
-        // Estrai la parte per il coefficiente "a"
         char *a_part = strndup(equation, x2_pos - equation);
         if (strlen(a_part) == 0 || strcmp(a_part, " ") == 0)
         {
-            *a = 1; // Se non c'è coefficiente scritto, allora è 1
+            *a = 1;
         }
         else if (strcmp(a_part, "-") == 0)
         {
-            *a = -1; // Se c'è solo "-", il coefficiente è -1
+            *a = -1;
         }
         else
         {
-            *a = atof(a_part); // Converti il coefficiente "a"
+            *a = atof(a_part);
         }
         free(a_part);
     }
 
-    // Trova la posizione di "x"
-    char *x_pos = strstr(equation, "x");
-    if (x_pos != NULL && x_pos > x2_pos) // Assicurati che non sia "x^2"
+    char *x_pos = strstr(x2_pos ? x2_pos + 3 : equation, "x");
+    if (x_pos != NULL)
     {
-        // Estrai la parte per il coefficiente "b"
-        char *b_part = strndup(x2_pos + 3, x_pos - (x2_pos + 3)); // Salta "x^2"
+        char *b_part = strndup(x2_pos ? x2_pos + 3 : equation, x_pos - (x2_pos ? x2_pos + 3 : equation));
         if (strlen(b_part) == 0 || strcmp(b_part, " ") == 0)
         {
-            *b = 1; // Se non c'è coefficiente scritto, allora è 1
+            *b = 1;
         }
         else if (strcmp(b_part, "-") == 0)
         {
-            *b = -1; // Se c'è solo "-", il coefficiente è -1
+            *b = -1;
         }
         else
         {
-            *b = atof(b_part); // Converti il coefficiente "b"
+            *b = atof(b_part);
         }
         free(b_part);
     }
 
-    // Estrai il coefficiente "c"
-    char *c_part = strstr(equation, "+");
+    char *c_part = strstr(x_pos ? x_pos + 1 : equation, "+");
     if (c_part != NULL)
     {
         *c = atof(c_part + 1);
     }
     else
     {
-        c_part = strstr(equation, "-");
+        c_part = strstr(x_pos ? x_pos + 1 : equation, "-");
         if (c_part != NULL)
         {
-            *c = atof(c_part); // Gestisce anche il caso in cui "c" è negativo
+            *c = atof(c_part);
         }
         else
         {
-            *c = 0; // Se non c'è nessun termine libero, "c" è 0
+            *c = 0;
         }
     }
 }
