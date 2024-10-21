@@ -81,12 +81,10 @@ void parabola_draw(parabola_s *parabola, SDL_Renderer *renderer, SDL_Color color
     float x_start_virtual = (-origin_x) / zoom;
     float x_end_virtual = (w - origin_x) / zoom;
 
-    // Adjust coefficients for grid step
-    float adjusted_a = parabola->a;
+    float adjusted_a = parabola->a / grid_step;
     float adjusted_b = parabola->b;
     float adjusted_c = parabola->c * grid_step;
 
-    // Initialize the first points for the line
     float x_prev = x_start_virtual;
     float y_prev = adjusted_a * x_prev * x_prev + adjusted_b * x_prev + adjusted_c;
     int x_screen_prev = (int)(origin_x + x_prev * zoom);
@@ -99,10 +97,8 @@ void parabola_draw(parabola_s *parabola, SDL_Renderer *renderer, SDL_Color color
         int x_screen = (int)(origin_x + x * zoom);
         int y_screen = (int)(origin_y - y * zoom);
 
-        // Draw a line between the previous point and the current point
         SDL_RenderDrawLine(renderer, x_screen_prev, y_screen_prev, x_screen, y_screen);
 
-        // Update the previous point
         x_screen_prev = x_screen;
         y_screen_prev = y_screen;
     }
