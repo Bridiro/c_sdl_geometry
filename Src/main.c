@@ -15,6 +15,7 @@ int main()
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, NULL);
+    SDL_StartTextInput();
 
     float zoom = 1;
     int pan_x = 0;
@@ -32,7 +33,7 @@ int main()
 
     bezier_s bez = bezier_new();
     cartesian_graph_s cart = cartesian_graph_new(20, White, White);
-    cart.equation = "0.5x+2";
+    cart.equation = NULL;
 
     SDL_Event e;
     int quit = 0;
@@ -151,8 +152,41 @@ int main()
                     mode = !mode;
                     break;
                 }
-                break;
+                case SDLK_BACKSPACE:
+                {
+                    if (mode == CARTESIAN && cart.equation != NULL && strlen(cart.equation) > 0)
+                    {
+                        cart.equation[strlen(cart.equation) - 1] = '\0';
+                    }
+                    break;
                 }
+                }
+                break;
+            }
+            case SDL_TEXTINPUT:
+            {
+                if (mode == CARTESIAN)
+                {
+                    char *character = e.text.text;
+                    if (cart.equation == NULL)
+                    {
+                        cart.equation = (char *)malloc(strlen(character) + 1);
+                        if (cart.equation != NULL) // Controlla se malloc ha successo
+                        {
+                            strcpy(cart.equation, character);
+                        }
+                    }
+                    else
+                    {
+                        char *new_equation = (char *)realloc(cart.equation, strlen(cart.equation) + strlen(character) + 1);
+                        if (new_equation != NULL) // Controlla se realloc ha successo
+                        {
+                            cart.equation = new_equation;
+                            strcat(cart.equation, character);
+                        }
+                    }
+                }
+                break;
             }
             }
 
@@ -170,11 +204,16 @@ int main()
                 cartesian_graph_draw(&cart, renderer, w, h, zoom, pan_x, pan_y);
                 cartesian_graph_draw_equation_result(&cart, renderer, White, w, h, zoom, pan_x, pan_y);
                 draw_text(renderer, Poppins20, White, "Cartesian Graph", 10, 10);
+                if (cart.equation != NULL && strlen(cart.equation) > 0)
+                {
+                    draw_text(renderer, Poppins15, White, cart.equation, 10, h - 48);
+                }
             }
             draw_text(renderer, Poppins15, White, "esc -> reset | +/- -> zoom | arrows -> change modes", 10, h - 30);
             SDL_RenderPresent(renderer);
         }
     }
+    SDL_StopTextInput();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

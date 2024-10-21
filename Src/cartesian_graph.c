@@ -65,6 +65,10 @@ void cartesian_graph_draw(cartesian_graph_s *cartesian_graph, SDL_Renderer *rend
  */
 void cartesian_graph_draw_equation_result(cartesian_graph_s *cartesian_graph, SDL_Renderer *renderer, SDL_Color color, int32_t w, int32_t h, float zoom, int32_t pan_x, int32_t pan_y)
 {
+    if (cartesian_graph->equation == NULL)
+    {
+        return;
+    }
     cartesian_graph->type = eq_parser_get_type(cartesian_graph->equation);
     switch (cartesian_graph->type)
     {

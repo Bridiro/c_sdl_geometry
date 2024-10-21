@@ -26,23 +26,23 @@ line_s line_new(float m, float q)
 void line_draw(line_s *line, SDL_Renderer *renderer, SDL_Color color, int32_t w, int32_t h, float zoom, int32_t pan_x, int32_t pan_y, int32_t grid_step)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-    int32_t start_x = -pan_x / zoom;
-    int32_t start_y = -pan_y / zoom;
-    int32_t end_x = (w - pan_x) / zoom;
-    int32_t end_y = (h - pan_y) / zoom;
+
+    float origin_x = w / 2.0f * zoom + pan_x;
+    float origin_y = h / 2.0f * zoom + pan_y;
+
+    float x_start_virtual = (-origin_x) / zoom;
+    float x_end_virtual = (w - origin_x) / zoom;
 
     float adjusted_q = line->q * grid_step;
-    int origin_y = h / 2 * zoom + pan_y;
-    int origin_x = w / 2 * zoom + pan_x;
-
-    float x_start_virtual = (start_x - origin_x + pan_x) / zoom;
-    float x_end_virtual = (end_x - origin_x + pan_x) / zoom;
 
     float y_start_virtual = line->m * x_start_virtual + adjusted_q;
     float y_end_virtual = line->m * x_end_virtual + adjusted_q;
 
-    int y_start_screen = origin_y - (int)(y_start_virtual * zoom) - pan_y;
-    int y_end_screen = origin_y - (int)(y_end_virtual * zoom) - pan_y;
+    int start_x_screen = 0;
+    int end_x_screen = w;
 
-    SDL_RenderDrawLine(renderer, start_x + pan_x, y_start_screen + pan_y, end_x + pan_x, y_end_screen + pan_y);
+    int y_start_screen = (int)(origin_y - y_start_virtual * zoom);
+    int y_end_screen = (int)(origin_y - y_end_virtual * zoom);
+
+    SDL_RenderDrawLine(renderer, start_x_screen, y_start_screen, end_x_screen, y_end_screen);
 }
