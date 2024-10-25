@@ -26,28 +26,28 @@ void cartesian_graph_draw(cartesian_graph_s *cartesian_graph, SDL_Renderer *rend
 {
     SDL_SetRenderDrawColor(renderer, cartesian_graph->grid_color.r, cartesian_graph->grid_color.g, cartesian_graph->grid_color.b, 100);
 
+    int32_t grid_distance_zoomed = (int32_t)(cartesian_graph->grid_distance * zoom);
     int32_t center_x = w / 2 * zoom + pan_x;
     int32_t center_y = h / 2 * zoom + pan_y;
-    int32_t start_x = -pan_x / zoom;
-    int32_t start_y = -pan_y / zoom;
-    int32_t end_x = (w - pan_x) / zoom;
-    int32_t end_y = (h - pan_y) / zoom;
+    int32_t start_x = center_x % grid_distance_zoomed;
+    int32_t start_y = center_y % grid_distance_zoomed;
 
-    for (int32_t x = start_x; x <= end_x; x++)
+    for (int32_t x = start_x; x < w; x += grid_distance_zoomed)
     {
-        if (x % cartesian_graph->grid_distance == 0)
-        {
-            int32_t screen_x = (int32_t)(x * zoom + pan_x);
-            SDL_RenderDrawLine(renderer, screen_x, 0, screen_x, h);
-        }
+        SDL_RenderDrawLine(renderer, x, 0, x, h);
     }
-    for (int32_t y = start_y; y <= end_y; y++)
+    for (int32_t x = start_x - grid_distance_zoomed; x >= 0; x -= grid_distance_zoomed)
     {
-        if (y % cartesian_graph->grid_distance == 0)
-        {
-            int32_t screen_y = (int32_t)(y * zoom + pan_y);
-            SDL_RenderDrawLine(renderer, 0, screen_y, w, screen_y);
-        }
+        SDL_RenderDrawLine(renderer, x, 0, x, h);
+    }
+
+    for (int32_t y = start_y; y < h; y += grid_distance_zoomed)
+    {
+        SDL_RenderDrawLine(renderer, 0, y, w, y);
+    }
+    for (int32_t y = start_y - grid_distance_zoomed; y >= 0; y -= grid_distance_zoomed)
+    {
+        SDL_RenderDrawLine(renderer, 0, y, w, y);
     }
 
     SDL_SetRenderDrawColor(renderer, cartesian_graph->axis_color.r, cartesian_graph->axis_color.g, cartesian_graph->axis_color.b, 255);
