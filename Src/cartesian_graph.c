@@ -26,6 +26,8 @@ void cartesian_graph_draw(cartesian_graph_s *cartesian_graph, SDL_Renderer *rend
 {
     SDL_SetRenderDrawColor(renderer, cartesian_graph->grid_color.r, cartesian_graph->grid_color.g, cartesian_graph->grid_color.b, 100);
 
+    int32_t center_x = w / 2 * zoom + pan_x;
+    int32_t center_y = h / 2 * zoom + pan_y;
     int32_t start_x = -pan_x / zoom;
     int32_t start_y = -pan_y / zoom;
     int32_t end_x = (w - pan_x) / zoom;
@@ -49,8 +51,8 @@ void cartesian_graph_draw(cartesian_graph_s *cartesian_graph, SDL_Renderer *rend
     }
 
     SDL_SetRenderDrawColor(renderer, cartesian_graph->axis_color.r, cartesian_graph->axis_color.g, cartesian_graph->axis_color.b, 255);
-    SDL_RenderDrawLine(renderer, 0, h / 2 * zoom + pan_y, w, h / 2 * zoom + pan_y);
-    SDL_RenderDrawLine(renderer, w / 2 * zoom + pan_x, 0, w / 2 * zoom + pan_x, h);
+    SDL_RenderDrawLine(renderer, 0, center_y, w, center_y);
+    SDL_RenderDrawLine(renderer, center_x, 0, center_x, h);
 }
 
 /**
