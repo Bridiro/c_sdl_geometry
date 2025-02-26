@@ -1,8 +1,8 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 #include <math.h>
 
 int is_near(int32_t p_x, int32_t p_y, int32_t mouse_x, int32_t mouse_y);

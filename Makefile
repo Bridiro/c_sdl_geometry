@@ -1,3 +1,5 @@
+OS = $(shell uname -s)
+
 CC = gcc
 CFLAGS = -Wall -g
 LINKER_FLAGS = -lSDL2 -lSDL2_ttf -lm
@@ -7,6 +9,13 @@ SRCS = $(wildcard */*.c)
 OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SRCS)))
 INC=Inc/
 INCLUDES=$(foreach d, $(INC), -I$d)
+
+ifeq ($(OS), Darwin) 
+	INCLUDES += -I/opt/homebrew/Cellar/sdl2/2.30.10/include/SDL2
+	INCLUDES += -I/opt/homebrew/Cellar/sdl2_ttf/2.24.0/include/SDL2
+	LINKER_FLAGS += -L/opt/homebrew/Cellar/sdl2/2.30.10/lib
+	LINKER_FLAGS += -L/opt/homebrew/Cellar/sdl2_ttf/2.24.0/lib
+endif
 
 vpath %.c Src/
 

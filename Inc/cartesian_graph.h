@@ -1,7 +1,7 @@
 #ifndef CARTESIAN_GRAPH_H
 #define CARTESIAN_GRAPH_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "functions.h"
 #include "eq_parser.h"
 
